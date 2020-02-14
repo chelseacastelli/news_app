@@ -4,7 +4,7 @@ import 'package:news_app/src/model/category/top_headlines_news/response_top_head
 class ApiProvider {
   final Dio _dio = Dio();
   final String _baseUrl =
-      'https://newsapi.org/v2/top-headlines?country=id&apiKey=3e0a95f02d194299be9ef273a27efb71';
+      'https://newsapi.org/v2/top-headlines?country=us&apiKey=3e0a95f02d194299be9ef273a27efb71';
 
   void printOutError(error, StackTrace stacktrace) {
     print('Exception occured: $error with stacktrace: $stacktrace');

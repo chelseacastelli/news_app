@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/src/bloc/home/home_bloc.dart';
@@ -19,10 +22,10 @@ class HomeScreen extends StatelessWidget {
               children: <Widget>[
                 Container(
                   decoration: BoxDecoration(
-                      color: Color(0xFFF1F5F9),
+                      color: Color(0xFF006064),
                       borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                      )),
+//                        bottomLeft: Radius.circular(20),
+                          )),
                   padding: EdgeInsets.only(
                     top: paddingTop + 16.0,
                     bottom: 16.0,
@@ -39,10 +42,43 @@ class HomeScreen extends StatelessWidget {
                       WidgetCategory(),
                     ],
                   ),
+                ),
+                SizedBox(height: 16.0),
+                _buildWidgetLabelLatestNews(context),
+                _buildWidgetSubtitleLatestNews(context),
+                Expanded(
+                  child: WidgetLatestNews(),
                 )
-                // TODO: do something here
               ],
             )));
+  }
+
+  Widget _buildWidgetSubtitleLatestNews(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Text(
+          'Top stories at the moment',
+          style: Theme.of(context).textTheme.caption.merge(
+                TextStyle(
+                  color: Color(0xFF9E9E9E).withOpacity(0.8),
+                ),
+              ),
+        ));
+  }
+
+  Widget _buildWidgetLabelLatestNews(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
+        'US News',
+        style: Theme.of(context).textTheme.subtitle.merge(
+              TextStyle(
+                fontSize: 18.0,
+                color: Color(0xFF006064).withOpacity(0.8),
+              ),
+            ),
+      ),
+    );
   }
 
   String getStrToday() {
@@ -77,10 +113,10 @@ class WidgetTitle extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: 'News Today\n',
+                text: 'The Goat News\n',
                 style: Theme.of(context).textTheme.title.merge(
                       TextStyle(
-                        color: Color(0xFF325384),
+                        color: Color(0xFFE0F7FA),
                       ),
                     ),
               ),
@@ -88,7 +124,7 @@ class WidgetTitle extends StatelessWidget {
                 text: strToday,
                 style: Theme.of(context).textTheme.caption.merge(
                       TextStyle(
-                        color: Color(0xFF325384).withOpacity(0.8),
+                        color: Color(0xFFE0F7FA).withOpacity(0.8),
                         fontSize: 10.0,
                       ),
                     ),
@@ -108,12 +144,12 @@ class WidgetCategory extends StatefulWidget {
 
 class _WidgetCategoryState extends State<WidgetCategory> {
   final listCategories = [
-    Category('', 'All'),
+    Category('', 'Top'),
     Category('assets/images/img_business.png', 'Business'),
-    Category('assets/images/img_entertainment.png', 'Entertainment'),
+    Category('assets/images/img_entertainment.png', 'Pop Culture'),
     Category('assets/images/img_health.png', 'Health'),
     Category('assets/images/img_science.png', 'Science'),
-    Category('assets/images/img_sport.png', 'Sport'),
+    Category('assets/images/img_sport.png', 'Sports'),
     Category('assets/images/img_technology.png', 'Technology')
   ];
   int indexSelectedCategory = 0;
@@ -144,7 +180,11 @@ class _WidgetCategoryState extends State<WidgetCategory> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    //TODO: do something in here
+                    setState(() {
+                      indexSelectedCategory = index;
+                      homeBloc.add(DataEvent(
+                          listCategories[indexSelectedCategory].title));
+                    });
                   },
                   child: index == 0
                       ? Container(
@@ -155,7 +195,7 @@ class _WidgetCategoryState extends State<WidgetCategory> {
                             color: Color(0xFFBDCDDE),
                             border: indexSelectedCategory == index
                                 ? Border.all(
-                                    color: Colors.white,
+                                    color: Color(0xFF006064),
                                     width: 5.0,
                                   )
                                 : null,
@@ -175,7 +215,8 @@ class _WidgetCategoryState extends State<WidgetCategory> {
                               fit: BoxFit.cover,
                             ),
                             border: indexSelectedCategory == index
-                                ? Border.all(color: Colors.white, width: 5.0)
+                                ? Border.all(
+                                    color: Color(0xFF006064), width: 5.0)
                                 : null,
                           ),
                         ),
@@ -185,7 +226,7 @@ class _WidgetCategoryState extends State<WidgetCategory> {
                   itemCategory.title,
                   style: TextStyle(
                     fontSize: 14.0,
-                    color: Color(0xFF325384),
+                    color: Color(0xFFE0F7FA),
                     fontWeight: indexSelectedCategory == index
                         ? FontWeight.bold
                         : FontWeight.normal,
@@ -199,5 +240,54 @@ class _WidgetCategoryState extends State<WidgetCategory> {
       ),
     );
     return Container();
+  }
+}
+
+class WidgetLatestNews extends StatefulWidget {
+  WidgetLatestNews();
+
+  @override
+  _WidgetLatestNewsState createState() => _WidgetLatestNewsState();
+}
+
+class _WidgetLatestNewsState extends State<WidgetLatestNews> {
+  @override
+  Widget build(BuildContext context) {
+    MediaQueryData mediaQuery = MediaQuery.of(context);
+    final HomeBloc homeBloc = BlocProvider.of<HomeBloc>(context);
+    return Padding(
+      padding: EdgeInsets.only(
+          left: 16.0,
+          top: 8.0,
+          right: 16.0,
+          bottom: mediaQuery.padding.bottom + 16.0),
+      child: BlocListener<HomeBloc, DataState>(
+          listener: (context, state) {
+            //TODO: do something here
+          },
+          child: BlocBuilder(
+            bloc: homeBloc,
+            builder: (context, state) {
+              return _buildWidgetContentLatestNews(state, mediaQuery);
+            },
+          )),
+    );
+  }
+
+  Widget _buildWidgetContentLatestNews(
+      DataState state, MediaQueryData mediaQuery) {
+    if (state is DataLoading) {
+      return Center(
+          child: Platform.isAndroid
+              ? CircularProgressIndicator()
+              : CupertinoActivityIndicator());
+    } else if (state is DataSuccess) {
+      return Container(
+          child: Center(
+        child: Text('data success'),
+      ));
+    } else {
+      return Container();
+    }
   }
 }

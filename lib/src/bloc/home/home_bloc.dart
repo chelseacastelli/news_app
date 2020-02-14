@@ -37,7 +37,7 @@ class HomeBloc extends Bloc<DataEvent, DataState> {
     yield DataLoading();
     final categoryLowerCase = event.category.toLowerCase();
     switch (categoryLowerCase) {
-      case 'all':
+      case 'top':
         final data = await apiRepository.fetchTopHeadlinesNews();
         if (data.error == null) {
           yield DataSuccess(data);
@@ -53,7 +53,7 @@ class HomeBloc extends Bloc<DataEvent, DataState> {
           yield DataFailed('{$data.error}');
         }
         break;
-      case 'entertainment':
+      case 'pop culture':
         final data = await apiRepository.fetchTopEntertainmentHeadlinesNews();
         if (data.error == null) {
           yield DataSuccess(data);
@@ -77,7 +77,7 @@ class HomeBloc extends Bloc<DataEvent, DataState> {
           yield DataFailed('{$data.error}');
         }
         break;
-      case 'sport':
+      case 'sports':
         final data = await apiRepository.fetchTopSportHeadlinesNews();
         if (data.error == null) {
           yield DataSuccess(data);
