@@ -8,6 +8,9 @@ import 'package:news_app/src/bloc/home/home_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:news_app/src/model/category/category.dart';
 import 'package:news_app/src/model/category/top_headlines_news/response_top_headlines_news.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+final GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -17,6 +20,7 @@ class HomeScreen extends StatelessWidget {
     double paddingTop = mediaQuery.padding.top;
 
     return Scaffold(
+        key: scaffoldState,
         body: BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(),
             child: Column(
@@ -265,7 +269,11 @@ class _WidgetLatestNewsState extends State<WidgetLatestNews> {
           bottom: mediaQuery.padding.bottom + 16.0),
       child: BlocListener<HomeBloc, DataState>(
           listener: (context, state) {
-            //TODO: do something here
+            if (state is DataFailed) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage)),
+              );
+            }
           },
           child: BlocBuilder(
             bloc: homeBloc,
@@ -317,7 +325,13 @@ class _WidgetLatestNewsState extends State<WidgetLatestNews> {
                 ),
                 GestureDetector(
                   onTap: () async {
-//                   // TODO: do something in here
+                    if (await canLaunch(itemArticle.url)) {
+                      await launch(itemArticle.url);
+                    } else {
+                      scaffoldState.currentState.showSnackBar(SnackBar(
+                        content: Text('Could not launch article'),
+                      ));
+                    }
                   },
                   child: Container(
                     width: mediaQuery.size.width,
@@ -390,7 +404,13 @@ class _WidgetLatestNewsState extends State<WidgetLatestNews> {
           } else {
             return GestureDetector(
               onTap: () async {
-                // TODO: do something in here
+                if (await canLaunch(itemArticle.url)) {
+                  await launch(itemArticle.url);
+                } else {
+                  scaffoldState.currentState.showSnackBar(SnackBar(
+                    content: Text('Could not launch article'),
+                  ));
+                }
               },
               child: Container(
                 width: mediaQuery.size.width,
