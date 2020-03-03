@@ -36,6 +36,7 @@ dev_dependencies:
   # Tools to write binaries that run builders
   build_runner: ^1.7.1
 
+
 flutter:
 
   # The following line ensures that the Material Icons font is
